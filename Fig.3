@@ -1,0 +1,184 @@
+R
+Sys.setenv("http_proxy"="http://proxy.l2.med.tohoku.ac.jp:8080")
+Sys.setenv("https_proxy"="http://proxy.l2.med.tohoku.ac.jp:8080")
+
+library(tximport)
+library(jsonlite)
+library(readr)
+library(tidyverse)
+library(reshape2)
+library(ggthemes)
+library(gtable)
+
+setwd("/home/naoto/Data/RSEM/oral_mucosa/")
+getwd()
+
+samples <- read.table("group_test03.csv", header = TRUE, sep = ",")
+
+files <- file.path(".", paste0(samples$run, ".genes.results"))
+names(files) <- paste0("sample", 1:66)
+txi.rsem <- tximport(files, type = "rsem", txIn = FALSE, txOut = FALSE)
+head(txi.rsem$counts)
+
+
+tx2gene <- data.frame(
+    TXNAME = rownames(txi.rsem$counts),
+    GENEID = sapply(strsplit(rownames(txi.rsem$counts), '\\.'), '[', 1)
+)
+head(tx2gene)
+gene.exp <- tximport(files, type = "rsem", tx2gene = tx2gene)
+gene_from_tx.exp <- summarizeToGene(txi.rsem, tx2gene)
+write.csv(gene.exp$abundance, file = "gene_tpm.csv", row.names = TRUE)
+
+countdata <- read.csv("gene_tpm.csv")
+dim(countdata)
+countdata[1:5, 1:2]
+
+load("/home/naoto/Data/RSEM/hs_cells/alt.rda")
+
+count <- left_join(alt, countdata, by =c("ensembl_gene_id" = "X"))
+count[1:5, 1:3]
+
+NP <- filter(count, count$hgnc_symbol %in% c("KMT2A","KMT2B","KMT2C","KMT2D","SETD1A","SETD1B","KDM1A","KDM1B","KDM5A","KDM5B","KDM5C","KDM5D"))
+NP[, 1:3]
+
+rownames(NP) <- NP$hgnc_symbol
+NP <- NP[,c(-1, -2)]
+
+NP <- t(NP)
+
+data <- cbind(samples, NP)
+data[, 1:4]
+
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KMT2A),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KMT2A", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KMT2A.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KMT2B),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KMT2B", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KMT2B.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KMT2C),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KMT2C", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KMT2C.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KMT2D),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KMT2D", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KMT2D.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(SETD1A),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KMT2F", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KMT2F.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(SETD1B),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KMT2G", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KMT2G.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KDM1A),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KDM1A", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KDM1A.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KDM1B),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KDM1B", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KDM1B.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KDM5A),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KDM5A", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KDM5A.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KDM5B),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KDM5B", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KDM5B.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KDM5C),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KDM5C", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KDM5C.png")
+//////////////////////////////////////////
+ggplot(data = data,
+       mapping = aes(x=hour,
+                     y=log(KDM5D),
+                     colour = range)) +
+  stat_smooth(method = "loess", formula = y ~ x, se = TRUE, fullrange = FALSE, level = 0.95) +
+  geom_point(size = 3) +
+  theme(text = element_text(size = 30)) +
+  labs(title="KDM5D", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
+  scale_x_continuous(breaks = seq(2,22,4)) 
+ggsave("KDM5D.png")
+//////////////////////////////////////////
