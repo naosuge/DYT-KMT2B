@@ -9,9 +9,7 @@ library(GOstats)
 library(simpleCache)
 library(sva)
 
-########################################################################
-# 1. Setting up the analysis environment
-########################################################################
+# 0. Setting up the analysis environment
 
 rnb.options(
 assembly = "hg38",
@@ -95,9 +93,6 @@ reg.types <- c("genes", "promoters")
 diffmeth <- rnb.execute.computeDiffMeth(rnb.set, cmp.cols, region.types=reg.types)
 
 str(diffmeth)
-save(diffmeth, file = "diffmeth.rda")
-#load("/home/naoto/Data/Bismark/3.1.cov/diffmeth.rda")
-
 
 comparison <- get.comparisons(diffmeth)[1]
 tab.sites <- get.table(diffmeth, comparison, "sites", return.data.frame=TRUE)
@@ -110,18 +105,6 @@ pdf(file="scatter.pdf")
 plot(dmrs[, "mean.mean.diff"], -log10(dmrs[, "comb.p.val"]),
 xlab="mean difference", ylab="-log10(combined p-value)", col="blue")
 dev.off()
-
-
-## 4.6.2 Paired Analysis
-# rnb.options("differential.comparison.columns"=c("diseaseState"),
-# "columns.pairing"=c("diseaseState"="individual"))
-
-rnb.options("differential.comparison.columns"=NULL,"columns.pairing"=NULL)
-
-## 4.6.3 Adjusting for Covariates in the Dfferential Analysis
-#rnb.options("covariate.adjustment.columns"=c("Passage_No"))
-#diffmeth.adj <- rnb.execute.computeDiffMeth(rnb.set, cmp.cols,
-#region.types=reg.types)
 
 
 ## 4.6.4 Enrichment Analysis of Differentially Methylated Regions
