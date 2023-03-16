@@ -142,7 +142,8 @@ class(enrich.table.go)
 summary(enrich.table.go)
 
 table01 <- summary(enrich.table.go)
-#
+
+# figure
 ggplot(table01[1:20,], aes(x=reorder(Term, -Pvalue), y=-log(Pvalue))) +
        geom_col(aes(fill=Pvalue)) +
        guides(fill = guide_legend(reverse = FALSE)) +
@@ -173,47 +174,9 @@ lolaDirs <- "/home/naoto/Data/LOLACore"
 
 enrich.lola <- performLolaEnrichment.diffMeth(rnb.set, diffmeth, lolaDbPaths="/home/naoto/Data/LOLACore/hg38/")
 
-enrich.table.lola <- enrich.lola$region[[comparison]][["promoters"]]
-enrich.table.lola <- enrich.table.lola[enrich.table.lola$userSet=="rankCut_500_hyper",]
-png("rankCut_500_hyper.png", width = 500, height = 350)
-lolaBarPlot(enrich.lola$lolaDb, enrich.table.lola, scoreCol="oddsRatio", orderCol="maxRnk", pvalCut=0.05)
-dev.off()
-
-png("box_rankCut_500_hyper.png", width = 500, height = 350)
-lolaBoxPlotPerTarget(enrich.lola$lolaDb, enrich.table.lola, scoreCol="pValueLog", orderCol="maxRnk", pvalCut=0.05)
-dev.off()
-
-
-#goto figure
+#figure
 enrich.table.lola <- enrich.lola$region[[comparison]][["promoters"]]
 enrich.table.lola <- enrich.table.lola[enrich.table.lola$userSet=="rankCut_1000_hyper",]
 png("rankCut_1000_hyper.png", width = 500, height = 350)
 lolaBarPlot(enrich.lola$lolaDb, enrich.table.lola, scoreCol="oddsRatio", orderCol="maxRnk", pvalCut=0.05)
 dev.off()
-
-png("box_rankCut_1000_hyper.png", width = 500, height = 350)
-lolaBoxPlotPerTarget(enrich.lola$lolaDb, enrich.table.lola, scoreCol="pValueLog", orderCol="maxRnk", pvalCut=0.05)
-dev.off()
-
-enrich.table.lola <- enrich.lola$region[[comparison]][["promoters"]]
-enrich.table.lola <- enrich.table.lola[enrich.table.lola$userSet=="rankCut_500_hypo",]
-png("rankCut_500_hypo.png", width = 500, height = 350)
-lolaBarPlot(enrich.lola$lolaDb, enrich.table.lola, scoreCol="oddsRatio", orderCol="maxRnk", pvalCut=0.05)
-dev.off()
-
-enrich.table.lola <- enrich.lola$region[[comparison]][["promoters"]]
-enrich.table.lola <- enrich.table.lola[enrich.table.lola$userSet=="rankCut_1000_hypo",]
-png("rankCut_1000_hypo.png", width = 500, height = 350)
-lolaBarPlot(enrich.lola$lolaDb, enrich.table.lola, scoreCol="oddsRatio", orderCol="maxRnk", pvalCut=0.05)
-dev.off()
-
-
-## 4.7 Tracks and Table
-rnb.options(export.to.csv=TRUE)
-rnb.run.tnt(rnb.set, report.dir)
-
-########################################################################################
-
-
-
-
