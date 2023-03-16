@@ -1,4 +1,4 @@
-# GSE199836
+# re-analyses of GSE199836 by
 # Lee S. et al. Epigenomics. 2022 May;14(9):537-547.doi: 10.2217/epi-2021-0521. Epub 2022 May 4.
 
 
@@ -57,7 +57,6 @@ rnb.set.unfiltered <- rnb.set
 result <- rnb.run.preprocessing(rnb.set.unfiltered, dir.reports=report.dir)
 rnb.set <- result$rnb.set
 # over 80GB memory used
-save(rnb.set, file = "rnb.set.rda")
 
 
 ## 5.3 Filtering instead of 4.3.1
@@ -131,24 +130,15 @@ ggplot(table01[1:20,], aes(x=reorder(Term, -Pvalue), y=-log(Pvalue))) +
        legend.text=element_text(size =8)) +
        scale_fill_gradient(low = "deeppink3", high = "midnightblue") +
        geom_text(aes(label=OddsRatio), size = 3, color ="snow2", hjust = 1.2, vjust = 1) 
-ggsave(file="GO_hyper.png")
 
-
-
-
-enrich.table.go <- enrich.go[["region"]][[comparison]][["BP"]][["promoters"]][["rankCut_500"]][["hyper"]]
-class(enrich.table.go)
-summary(enrich.table.go)
 
 # lola
 lolaDest <- tempfile()
 dir.create(lolaDest)
-# lolaDirs <- downloadLolaDbs(lolaDest, dbs="LOLACore")
 lolaDirs <- "/home/naoto/Data/LOLACore"
-
 enrich.lola <- performLolaEnrichment.diffMeth(rnb.set, diffmeth, lolaDbPaths="/home/naoto/Data/LOLACore/hg38/")
 
-#figure
+# figure
 enrich.table.lola <- enrich.lola$region[[comparison]][["promoters"]]
 enrich.table.lola <- enrich.table.lola[enrich.table.lola$userSet=="rankCut_1000_hyper",]
 png("rankCut_1000_hyper.png", width = 500, height = 350)
