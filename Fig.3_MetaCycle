@@ -2,3 +2,10 @@
 # Gu F. et al. J Circadian Rhythms. 2021 Jun 17;19:8.doi: 10.5334/jcr.213. 
 
 R
+library(MetaCycle)
+setwd("/path/to/dir/")
+
+meta3d(datafile="all.csv", cycMethodOne="JTK",
+designfile="design.csv", outdir="result",
+filestyle="csv", design_libColm=1, design_subjectColm=2,
+design_hrColm=4, design_groupColm=3)
