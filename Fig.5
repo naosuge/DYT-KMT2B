@@ -91,12 +91,6 @@ cresult <- clusterings.promoters[[7]]@result
 attr(cresult, "class") <- "hclust"
 cresult <- as.dendrogram(cresult)
 
-pdf(file="promoter_heatmap.pdf")
-heatmap.2(X, Rowv=TRUE, Colv=NA, dendrogram="both",scale="none", trace="none")
-dev.off()
-
-heatmap.2(X, Rowv=TRUE, Colv=cresult, dendrogram="both",scale="none", trace="none")
-
 
 ## 4.6 Differential Methylation Analysis
 cmp.cols <- "Sample_Group"
