@@ -42,10 +42,19 @@ result <- rnb.run.import(data.source=data.source, data.type="bs.bed.dir", dir.re
 rnb.set <- result$rnb.set
 rnb.set
 
+# Object of class RnBiseqSet
+#       39 samples
+# 23056898 methylation sites
+# Region types:
+# 	  578875 regions of type tiling
+# 	   54610 regions of type genes
+#	   59359 regions of type promoters
+#	   27734 regions of type cpgislands
+# Coverage information is present
+
 
 ## 4.2 Quality Control
 rnb.run.qc(rnb.set, report.dir)
-# html report was generate
 
 
 ## 4.3 Preprocessing
