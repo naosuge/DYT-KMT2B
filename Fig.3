@@ -1,55 +1,63 @@
-R
-Sys.setenv("http_proxy"="http://proxy.l2.med.tohoku.ac.jp:8080")
-Sys.setenv("https_proxy"="http://proxy.l2.med.tohoku.ac.jp:8080")
+# GSE186805
+# Gu F. et al. J Circadian Rhythms. 2021 Jun 17;19:8.doi: 10.5334/jcr.213. 
 
-library(tximport)
-library(jsonlite)
-library(readr)
+R
+## Sys.setenv("http_proxy"="http://proxy.l2.med.tohoku.ac.jp:8080")
+## Sys.setenv("https_proxy"="http://proxy.l2.med.tohoku.ac.jp:8080")
+
 library(tidyverse)
 library(reshape2)
 library(ggthemes)
 library(gtable)
+library(biomaRt)
 
-setwd("/home/naoto/Data/RSEM/oral_mucosa/")
-getwd()
+## setwd("/home/naoto/Data/RSEM/oral_mucosa/")
+## getwd()
 
 samples <- read.table("group_test03.csv", header = TRUE, sep = ",")
-
-files <- file.path(".", paste0(samples$run, ".genes.results"))
-names(files) <- paste0("sample", 1:66)
-txi.rsem <- tximport(files, type = "rsem", txIn = FALSE, txOut = FALSE)
-head(txi.rsem$counts)
-
-
-tx2gene <- data.frame(
-    TXNAME = rownames(txi.rsem$counts),
-    GENEID = sapply(strsplit(rownames(txi.rsem$counts), '\\.'), '[', 1)
-)
-head(tx2gene)
-gene.exp <- tximport(files, type = "rsem", tx2gene = tx2gene)
-gene_from_tx.exp <- summarizeToGene(txi.rsem, tx2gene)
-write.csv(gene.exp$abundance, file = "gene_tpm.csv", row.names = TRUE)
+samples %>% head
+       race age range hour         run
+1 Caucasian  50 41-60   10 SRR16633301
+2 Caucasian  50 41-60   14 SRR16633302
+3 Caucasian  50 41-60   18 SRR16633303
+4 Caucasian  50 41-60   22 SRR16633304
+5 Caucasian  50 41-60    2 SRR16633305
+6 Caucasian  50 41-60    6 SRR16633306
 
 countdata <- read.csv("gene_tpm.csv")
-dim(countdata)
 countdata[1:5, 1:2]
+                X sample1
+1 ENSG00000000003    8.69
+2 ENSG00000000005    0.00
+3 ENSG00000000419    4.56
+4 ENSG00000000457    0.94
+5 ENSG00000000460    0.50
 
-load("/home/naoto/Data/RSEM/hs_cells/alt.rda")
+# biomaRt
+db <- useMart("ensembl")
+hd <- useDataset("hsapiens_gene_ensembl", mart = db)
+alt <- getBM(attributes = c("hgnc_symbol", "ensembl_gene_id"), 
+         filters = "ensembl_gene_id", values = countdata$X, 
+         mart = hd, useCache = FALSE)
 
 count <- left_join(alt, countdata, by =c("ensembl_gene_id" = "X"))
 count[1:5, 1:3]
+  hgnc_symbol ensembl_gene_id sample1
+1      TSPAN6 ENSG00000000003    8.69
+2        TNMD ENSG00000000005    0.00
+3        DPM1 ENSG00000000419    4.56
+4       SCYL3 ENSG00000000457    0.94
+5    C1orf112 ENSG00000000460    0.50
 
 NP <- filter(count, count$hgnc_symbol %in% c("KMT2A","KMT2B","KMT2C","KMT2D","SETD1A","SETD1B","KDM1A","KDM1B","KDM5A","KDM5B","KDM5C","KDM5D"))
-NP[, 1:3]
-
 rownames(NP) <- NP$hgnc_symbol
 NP <- NP[,c(-1, -2)]
-
 NP <- t(NP)
-
 data <- cbind(samples, NP)
-data[, 1:4]
 
+# ggplot
+# KMT2A
+dev.new(width=9, height=7)
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KMT2A),
@@ -60,7 +68,8 @@ ggplot(data = data,
   labs(title="KMT2A", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KMT2A.png")
-//////////////////////////////////////////
+
+# KMT2B
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KMT2B),
@@ -71,7 +80,8 @@ ggplot(data = data,
   labs(title="KMT2B", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KMT2B.png")
-//////////////////////////////////////////
+
+# KMT2C
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KMT2C),
@@ -82,7 +92,8 @@ ggplot(data = data,
   labs(title="KMT2C", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KMT2C.png")
-//////////////////////////////////////////
+
+# KMT2D
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KMT2D),
@@ -93,7 +104,8 @@ ggplot(data = data,
   labs(title="KMT2D", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KMT2D.png")
-//////////////////////////////////////////
+
+# KMT2F
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(SETD1A),
@@ -104,7 +116,8 @@ ggplot(data = data,
   labs(title="KMT2F", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KMT2F.png")
-//////////////////////////////////////////
+
+# KMT2G
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(SETD1B),
@@ -115,7 +128,8 @@ ggplot(data = data,
   labs(title="KMT2G", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KMT2G.png")
-//////////////////////////////////////////
+
+# KDM1A
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KDM1A),
@@ -126,7 +140,8 @@ ggplot(data = data,
   labs(title="KDM1A", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KDM1A.png")
-//////////////////////////////////////////
+
+# KDM1B
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KDM1B),
@@ -137,7 +152,8 @@ ggplot(data = data,
   labs(title="KDM1B", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KDM1B.png")
-//////////////////////////////////////////
+
+# KDM5A
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KDM5A),
@@ -148,7 +164,8 @@ ggplot(data = data,
   labs(title="KDM5A", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KDM5A.png")
-//////////////////////////////////////////
+
+# KDM5B
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KDM5B),
@@ -159,7 +176,8 @@ ggplot(data = data,
   labs(title="KDM5B", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KDM5B.png")
-//////////////////////////////////////////
+
+# KDM5C
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KDM5C),
@@ -170,7 +188,8 @@ ggplot(data = data,
   labs(title="KDM5C", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KDM5C.png")
-//////////////////////////////////////////
+
+# KDM5D
 ggplot(data = data,
        mapping = aes(x=hour,
                      y=log(KDM5D),
@@ -181,4 +200,5 @@ ggplot(data = data,
   labs(title="KDM5D", x="Wall-clock time (h)", y="logTPM", colour="Age (years old)")+
   scale_x_continuous(breaks = seq(2,22,4)) 
 ggsave("KDM5D.png")
-//////////////////////////////////////////
+
+dev.off()
