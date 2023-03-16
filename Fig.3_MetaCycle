@@ -5,6 +5,7 @@ R
 library(MetaCycle)
 setwd("/path/to/dir/")
 
+# MetaCycle, using meta3d analyses with JTK method
 meta3d(datafile="all.csv", cycMethodOne="JTK",
 designfile="design.csv", outdir="result",
 filestyle="csv", design_libColm=1, design_subjectColm=2,
